@@ -6,5 +6,12 @@
 
 module.exports = {
   /* Your site config here */
-  plugins: [],
+  siteMetadata: {
+    title: 'Flash Cards',
+    author: 'Alan C'
+  },
+  plugins: [
+    'gatsby-plugin-sass',
+    `gatsby-plugin-material-ui`
+  ],
 }
