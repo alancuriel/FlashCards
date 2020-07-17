@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import Layout from "../components/layout"
-import { Input, InputBase, IconButton } from "@material-ui/core"
+import { Input, InputBase, IconButton, Popover, Button } from "@material-ui/core"
 import AddIcon from "@material-ui/icons/Add"
+import MoreVertIcon from "@material-ui/icons/MoreVert"
 
 const CardSet = ({ id }) => {
   const [ID, setID] = useState()
@@ -22,8 +23,8 @@ const CardSet = ({ id }) => {
       .then(x => x.json())
       .then(x => {
         setID(x.Item.setId)
-		setName(x.Item.setTitle.S)
-		
+        setName(x.Item.setTitle.S)
+
         if (x.Item.cards) {
           setCards(x.Item.cards.L)
         }
@@ -45,7 +46,7 @@ const CardSet = ({ id }) => {
           },
           UpdateExpression: "Set cards = :c",
           ExpressionAttributeValues: {
-            ":c": {L : cards}
+            ":c": { L: cards },
           },
         }),
       }
@@ -75,41 +76,94 @@ const CardSet = ({ id }) => {
   }
 
   const addCard = () => {
-	setCards([...cards,
-		{
-      M: {
-        title: {
-          S: "",
-        },
-        desc: {
-          S: "",
+    setCards([
+      ...cards,
+      {
+        M: {
+          title: {
+            S: "",
+          },
+          desc: {
+            S: "",
+          },
         },
       },
-    }]) 
+    ])
   }
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const popref = useRef(0);
+
+  const handleClick = (event,index) => {
+    setAnchorEl(event.currentTarget);
+    popref.current = index;
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDeleteCard = () => {
+    var delIndex = popref.current;
+    var newCards = cards;
+
+    newCards.splice(delIndex, 1);
+    setCards(newCards);
+
+    handleClose();
+    sendCardUpdate();
+  };
+
+  const open = Boolean(anchorEl);
+  const popid = open ? 'simple-popover' : undefined;
 
   return (
     <Layout>
       <h1 style={{ fontSize: "4rem", marginBottom: ".5rem" }}>{name}</h1>
       <h1 style={{ marginTop: "0", opacity: 0.9 }}>{cards.length}/50 cards</h1>
+      
+      <Popover
+        id={popid}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <Button color="secondary" onClick={handleDeleteCard}>
+          Delete
+        </Button>
+      </Popover>
+
       <div className="flash-cards">
         {cards.map((c, i) => {
           return (
             <div className="card">
-              <Input
-                defaultValue={c.M.title.S}
-                color="primary"
-                style={{
-                  margin: "1.2rem 1.2rem auto",
-                  width: "80%",
-                  fontWeight: 600,
-                }}
-                inputProps={{ maxLength: 35 }}
-                onChange={e => {
-                  updateCardTitle(i, e)
-                  updateCard()
-                }}
-              />
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                <Input
+                  defaultValue={c.M.title.S}
+                  color="primary"
+                  style={{
+                    margin: "1.2rem 1.2rem auto",
+                    width: "80%",
+                    fontWeight: 600,
+                  }}
+                  inputProps={{ maxLength: 35, }}
+                  onChange={e => {
+                    updateCardTitle(i, e)
+                    updateCard()
+                  }}
+                />
+                <IconButton style={{marginRight:".2rem", marginTop: ".2rem"}} 
+                onClick={(e) => handleClick(e,i)}>
+                  <MoreVertIcon />
+                </IconButton>
+              </div>
               <InputBase
                 style={{ margin: ".5rem 1.2rem", width: "80%" }}
                 defaultValue={c.M.desc.S}
