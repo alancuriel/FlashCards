@@ -103,14 +103,11 @@ const CardSet = ({ id }) => {
   };
 
   const handleDeleteCard = () => {
-    var delIndex = popref.current;
-    var newCards = cards;
-
-    newCards.splice(delIndex, 1);
+    
+    let newCards = [...cards];
+    let i = newCards.findIndex(c => c.M.title.S === popref.current);
+    newCards.splice(i,1);
     setCards(newCards);
-
-    handleClose();
-    sendCardUpdate();
   };
 
   const open = Boolean(anchorEl);
@@ -143,7 +140,7 @@ const CardSet = ({ id }) => {
       <div className="flash-cards">
         {cards.map((c, i) => {
           return (
-            <div className="card">
+            <div className="card" >
               <div style={{ display: "flex", flexDirection: "row" }}>
                 <Input
                   defaultValue={c.M.title.S}
@@ -160,7 +157,7 @@ const CardSet = ({ id }) => {
                   }}
                 />
                 <IconButton style={{marginRight:".2rem", marginTop: ".2rem"}} 
-                onClick={(e) => handleClick(e,i)}>
+                onClick={(e) => handleClick(e,c.M.title.S)}>
                   <MoreVertIcon />
                 </IconButton>
               </div>
@@ -170,12 +167,12 @@ const CardSet = ({ id }) => {
                 multiline={true}
                 inputProps={{ maxLength: 200 }}
                 onChange={e => {
-                  updateCardDesc(i, e)
-                  updateCard()
+                  updateCardDesc(i, e);
+                  updateCard();
                 }}
               ></InputBase>
             </div>
-          )
+          );
         })}
         <div
           className="card"

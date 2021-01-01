@@ -87,7 +87,11 @@ const IndexPage = () => {
             <Link to={"/app/card-set/"+s.setId.S} style={{textDecoration:"none", color: "black", marginTop: "1.5rem"}}>
               <div className="set">
                 <h2 style={{ margin: "1.5rem .5rem auto" }}>{s.setTitle.S}</h2>
-                <h4 style={{ opacity: 0.75 }}>{s.cards ? s.cards.L.length : 0 }/50 cards</h4>
+                <h4 style={{ opacity: 0.75 , marginBottom: ".3rem"}}>{s.cards ? s.cards.L.length : 0 }/50 cards</h4>
+                <p style={{marginBottom: ".2rem"}}>
+                  <span>edit </span>
+                  <span>  delete</span>
+                </p>
               </div>
             </Link>
           )
